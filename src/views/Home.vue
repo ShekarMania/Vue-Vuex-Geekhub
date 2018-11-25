@@ -4,40 +4,13 @@
             <v-tabs-items
                 slot="tabitems">
                 <v-tab-item v-if="active === 'GITHUB'">
-                    <v-card
-                        flat
-                        v-for="(n, index) in list"
-                        :key="n._id"
-                        class="my-3 mx-3">
-                            <v-layout row wrap>
-                                <v-flex xs1 class="ml-1 mt-4 pt-1 text-md-center" >
-                                    <v-icon v-if="n.bookmark" style="cursor: pointer;color: #536DFE" @click="toggle(index)">star</v-icon>
-                                    <v-icon v-else style="cursor: pointer" @click="toggle(index)">star_border</v-icon>
-                                </v-flex>
-                                <v-flex xs10>
-                                    <v-card-title primary-title
-                                                style="cursor: pointer"
-                                    >
-                                        <a class="remove-anchor" :href="n.href">
-                                            <div>
-                                                <h5 class="title">{{n.title}}</h5>
-                                                <div>{{ n.description}}</div>
-                                            </div>
-                                        </a>
-                                    </v-card-title>
-                                    <v-card-actions>
-                                        <v-icon class="mr-1">stars</v-icon>
-                                        <span class="mr-3">{{n.stars.toLocaleString()}}</span>
-                                        <v-icon class="mr-1 rotate-icon">device_hub</v-icon>
-                                        <span class="mr-3">{{n.forks.toLocaleString()}}</span>
-                                    </v-card-actions>
-                                </v-flex>
-                            </v-layout>
-                    </v-card>
-                    <infinite-loading :identifier="infiniteId" @infinite="infiniteHandler"></infinite-loading>
+                    <h1>Github</h1>
+                </v-tab-item>
+                <v-tab-item v-if="active === 'MEDIUM'">
+                    <h1>MEDUIM</h1>
                 </v-tab-item>
                 <v-tab-item v-if="active === 'NOTES'">
-                        <v-card-title primary-title >
+                        <v-card-title primary-title>
                             <div style="width: 100%">
                                 <h3 class="headline mb-3 text-xs-left editor-title" contenteditable="true">Untitled</h3>
                                 <div class="wi"><froala :tag="'textarea'" :config="config" v-model="model"></froala></div>
@@ -97,6 +70,7 @@
 </template>
 <script>
 import Toolbar from '@/components/Toolbar'
+
 export default {
   name: 'Home',
   components: {
@@ -111,7 +85,17 @@ export default {
         'BOOKMARKS',
         'SHARED WITH ME'
       ],
-      active: 'GITHUB'
+      active: 'NOTES',
+      config: {
+        placeholder: 'Edit Me',
+        editorClass: 'vue-editor',
+        events: {
+          'froalaEditor.focus': function (e, editor) {
+            console.log(editor.selection.get())
+          }
+        }
+      },
+      model: null
     }
   }
 }
