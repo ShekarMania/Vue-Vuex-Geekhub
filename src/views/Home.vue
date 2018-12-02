@@ -4,7 +4,38 @@
             <v-tabs-items
                 slot="tabitems">
                 <v-tab-item v-if="active === 'GITHUB'">
-                    <h1>Github</h1>
+                    <v-card
+                        flat
+                        v-for="(n, index) in list"
+                        :key="n._id"
+                        class="my-3 mx-3"
+                >
+                        <v-layout row wrap>
+                            <v-flex xs1 class="ml-1 mt-4 pt-1 text-md-center" >
+                                <v-icon v-if="n.bookmark" style="cursor: pointer;color: #536DFE" @click="toggle(index)">star</v-icon>
+                                <v-icon v-else style="cursor: pointer" @click="toggle(index)">star_border</v-icon>
+                            </v-flex>
+                            <v-flex xs10>
+                                <v-card-title primary-title
+                                              style="cursor: pointer"
+                                >
+                                    <a class="remove-anchor" :href="n.href">
+                                        <div>
+                                            <h5 class="title">{{n.title}}</h5>
+                                            <div>{{ n.description}}</div>
+                                        </div>
+                                    </a>
+                                </v-card-title>
+                                <v-card-actions>
+                                    <v-icon class="mr-1">stars</v-icon>
+                                    <span class="mr-3">{{n.stars.toLocaleString()}}</span>
+                                    <v-icon class="mr-1 rotate-icon">device_hub</v-icon>
+                                    <span class="mr-3">{{n.forks.toLocaleString()}}</span>
+                                </v-card-actions>
+                            </v-flex>
+                        </v-layout>
+                </v-card>
+                <infinite-loading :identifier="infiniteId" @infinite="infiniteHandler"></infinite-loading>
                 </v-tab-item>
                 <v-tab-item v-if="active === 'MEDIUM'">
                     <h1>MEDUIM</h1>
@@ -70,6 +101,9 @@
 </template>
 <script>
 import Toolbar from '@/components/Toolbar'
+import { mapGetters } from 'vuex'
+import {FETCH_DATA_GITHUB , FETCH_DATA_MEDIUM} from '@/store/action.types'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'Home',
@@ -97,6 +131,45 @@ export default {
       },
       model: null
     }
+  },
+  computed: {
+    ...mapGetters('home', ['infiniteId']),
+    ...mapFields(`home`, ['list'])
+  },
+  methods: {
+      infiniteHandler($state) {
+      axios.get(`${this.api}/${this.page}`).then(({ data }) => {
+        if (data.docs && data.docs.length) {
+          this.page += 50;
+          let docs = null;
+          if (this.api === gitApi) {
+            docs = data.docs.map(doc => ({
+              ...doc,
+              bookmark: false,
+              href: `https://github.com/${doc.tags_url
+                .split("/")
+                .slice(4, -1)
+                .join("/")}`
+            }));
+          } else {
+            docs = data.docs;
+          }
+          this.list = this.list.concat(docs);
+          $state.loaded();
+        } else {
+          $state.complete();
+        }
+      });
+      if(this.active === 'GITHUB'){
+        this.$store
+          .dispatch('home/' + FETCH_DATA_GITHUB, $state)
+          .then((data) => {
+              $state.loaded();
+          })
+      }
+      
+      return this.list;
+    },
   }
 }
 </script>

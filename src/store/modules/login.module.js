@@ -1,8 +1,8 @@
 import APIService from '../../common/api.service'
 import JwtService from '../../common/jwt.service'
 import {
-  LOGIN
-//   LOGOUT,
+  LOGIN,
+  PURGE_AUTH
 //   REGISTER,
 //   CHECK_AUTH,
 //   UPDATE_USER
@@ -101,13 +101,13 @@ const mutations = {
     state.user = user
     state.errors = {}
     JwtService.saveToken(state.user.token)
+  },
+  [PURGE_AUTH] (state) {
+    state.isAuthenticated = false
+    state.user = {}
+    state.errors = {}
+    JwtService.destroyToken()
   }
-//   [PURGE_AUTH] (state) {
-//     state.isAuthenticated = false
-//     state.user = {}
-//     state.errors = {}
-//     JwtService.destroyToken()
-//   }
 }
 
 export default {

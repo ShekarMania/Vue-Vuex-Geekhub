@@ -9,9 +9,11 @@ import 'babel-polyfill'
 import {store} from './store/store'
 import APIService from '@/common/api.service'
 import './plugins/froala.plugin'
+import InfiniteLoading from 'vue-infinite-loading'
 
 Vue.use(Vuetify)
 APIService.init()
+Vue.use(InfiniteLoading)
 
 Vue.config.productionTip = false
 
